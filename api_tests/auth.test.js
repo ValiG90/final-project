@@ -1,10 +1,10 @@
 const { spec, request } = require("pactum");
 const { userLogin } = require("../lib/utils");
 const { createNote } = require("../lib/utils");
-const getNotes = require("../data/notes-schema.json");
+const getNotes = require("../data/get-notes-schema.json");
 const { faker } = require("@faker-js/faker");
 
-const baseUrl = "https://practice.expandtesting.com/notes/api";
+const baseUrl = "https://practice.expandtesting.com";
 
 describe("auth test suite", () => {
   let tokenId = "";
@@ -25,7 +25,7 @@ describe("auth test suite", () => {
       password: "AlaBalaPortocala",
     };
     await spec()
-      .post(`${baseUrl}/users/register`)
+      .post(`${baseUrl}/notes/api/users/register`)
       .withBody(requestBody)
       .expectStatus(201);
   });
@@ -36,9 +36,8 @@ describe("auth test suite", () => {
       password: "AlaBalaPortocala",
     };
     await spec()
-      .post(`${baseUrl}/users/register`)
+      .post(`${baseUrl}/notes/api/users/register`)
       .withBody(requestBodyInvalid)
-      .inspect()
       .expectStatus(400)
       .expectBodyContains("User name must be between 4 and 30 characters");
   });
@@ -54,19 +53,16 @@ describe("auth test suite", () => {
     };
 
     await spec()
-      .post(`${baseUrl}/notes`)
+      .post(`${baseUrl}/notes/api/notes`)
       .withHeaders("x-auth-token", tokenId)
-      // .inspect()
       .withBody(requestCreateNote)
       .expectStatus(200);
-    // .stores('responseBody' , 'res.body');
   });
 
   it("get all notes", async () => {
     await spec()
-      .get(`${baseUrl}/notes`)
+      .get(`${baseUrl}/notes/api/notes`)
       .withHeaders("x-auth-token", tokenId)
-      // .inspect()
       .expectStatus(200)
       .expectJsonSchema(getNotes);
   });
@@ -75,9 +71,8 @@ describe("auth test suite", () => {
     const noteId = await createNote(tokenId);
 
     await spec()
-      .delete(`${baseUrl}/notes/${noteId}`)
+      .delete(`${baseUrl}/notes/api/notes/${noteId}`)
       .withHeaders("x-auth-token", tokenId)
-      // .inspect()
       .expectStatus(200);
   });
 });
